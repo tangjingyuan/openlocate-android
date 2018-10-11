@@ -19,7 +19,6 @@ public class SharedPreferenceUtils {
     private SharedPreferenceUtils(Context context) {
         mContext = context;
         mSharedPreferences = context.getSharedPreferences(Constants.OPENLOCATE, Context.MODE_PRIVATE);
-        mSharedPreferencesEditor = mSharedPreferences.edit();
     }
 
     public static synchronized SharedPreferenceUtils getInstance(Context context) {
@@ -31,11 +30,13 @@ public class SharedPreferenceUtils {
     }
 
     public void setValue(String key, String value) {
+        SharedPreferences.Editor mSharedPreferencesEditor = mSharedPreferences.edit();
         mSharedPreferencesEditor.putString(key, value);
         mSharedPreferencesEditor.commit();
     }
 
     public void setValue(String key, int value) {
+        SharedPreferences.Editor mSharedPreferencesEditor = mSharedPreferences.edit();
         mSharedPreferencesEditor.putInt(key, value);
         mSharedPreferencesEditor.commit();
     }
@@ -45,11 +46,13 @@ public class SharedPreferenceUtils {
     }
 
     public void setValue(String key, long value) {
+        SharedPreferences.Editor mSharedPreferencesEditor = mSharedPreferences.edit();
         mSharedPreferencesEditor.putLong(key, value);
         mSharedPreferencesEditor.commit();
     }
 
     public void setValue(String key, boolean value) {
+        SharedPreferences.Editor mSharedPreferencesEditor = mSharedPreferences.edit();
         mSharedPreferencesEditor.putBoolean(key, value);
         mSharedPreferencesEditor.commit();
     }
@@ -69,40 +72,5 @@ public class SharedPreferenceUtils {
     public boolean getBoolanValue(String keyFlag, boolean defaultValue) {
         return mSharedPreferences.getBoolean(keyFlag, defaultValue);
     }
-
-    public void removeKey(String key) {
-        if (mSharedPreferencesEditor != null) {
-            mSharedPreferencesEditor.remove(key);
-            mSharedPreferencesEditor.commit();
-        }
-    }
-
-    public void saveMap(String key, HashMap<String,String> inputMap){
-            JSONObject jsonObject = new JSONObject(inputMap);
-            String jsonString = jsonObject.toString();
-            mSharedPreferencesEditor.putString(key, jsonString);
-    }
-
-    public HashMap<String,String> loadMap(String mapKey){
-        HashMap<String,String> outputMap = new HashMap<>();
-        String jsonString = mSharedPreferences.getString(mapKey, (new JSONObject()).toString());
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(jsonString);
-            Iterator<String> keysItr = jsonObject.keys();
-            while(keysItr.hasNext()) {
-                String key = keysItr.next();
-                String value = jsonObject.getString(key);
-                outputMap.put(key, value);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return outputMap;
-    }
-
-    public void clear() {
-        mSharedPreferencesEditor.clear().commit();
-    }
+    
 }

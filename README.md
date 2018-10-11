@@ -53,9 +53,9 @@ Openlocate uses the following permissions:
 
 OpenLocate initialises a  background service alongside your application. This background service collects  and transmits location updates.
 
-The location updates rely on Google Play Services' `Fused Location Provider`. The location collection interval is set at a default of 3 minutes. Actual  location updates received can be more frequent than this however, as OpenLocate will receive passive fixes (location updates triggered by other applications) if there are any.
+The location updates rely on Google Play Services' `Fused Location Provider`. The location collection interval is set at a default of 5 minutes. Actual  location updates received can be more frequent than this however, as OpenLocate will receive passive fixes (location updates triggered by other applications) if there are any.
 
-In order to minimize battery usage and network traffic to your server, the location updates are not transmitted immediately, but rather batched locally for sending at a defined interval. The default transmission interval is one hour. Once successfully transmitted, the location updates are no longer stored on the device.
+In order to minimize battery usage and network traffic to your server, the location updates are not transmitted immediately, but rather batched locally for sending at a defined interval. The default transmission interval is six hours. Once successfully transmitted, the location updates are no longer stored on the device.
 
 ## Installation
 
@@ -73,8 +73,14 @@ repositories {
 
 Add the below line to your app's `build.gradle` inside the `dependencies` section:
 
+Latested public release
 ```groovy
 compile 'com.openlocate:openlocate:1.+'
+```
+
+Latest v2.0 release candidate
+```groovy
+compile 'com.openlocate:openlocate:2.0.0-rc-1'
 ```
 
 ## Usage
@@ -101,7 +107,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         
-      
         OpenLocate.Configuration config = new OpenLocate.Configuration.Builder(this, BuildConfig.URL)
             .setHeaders(<Your Headers>)
             .build();
@@ -139,32 +144,6 @@ public class MyApplication extends Application {
 
 ```
 
-
-#### For example, to send data to SafeGraph:
-
-```java
-import android.app.Application;
-import com.openlocate.android.core.OpenLocate;
-
-public class MyApplication extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        String url = "https://api.safegraph.com/v1/provider/<UUID>/devicelocation"
-
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer <TOKEN>");
-
-        OpenLocate.Configuration config = new OpenLocate.Configuration.Builder(this, url)
-            .setHeaders(headers)
-            .build();
-
-        OpenLocate.initialize(config);
-    }
-}
-```
 
 ### Start tracking:
 Activity should be passed to method below. Library will request permission for you.
@@ -269,10 +248,10 @@ private Map<String, String> getQueryMapGoogle(OpenLocateLocation location ) {
         return queryMap;
 }
 
-public void fetchGooglePlaces(OpenLocateLocation openLocateLocation, final SafeGraphPlaceCallback callback) {
+public void fetchGooglePlaces(OpenLocateLocation openLocateLocation, final GooglePlaceCallback callback) {
 
-        GooglePlaceClient safeGraphPlaceClient = GooglePlaceClientGenerator.createClient(GooglePlaceClient.class);
-        Call<GooglePlaceBody> call=safeGraphPlaceClient.getNearByPlaces(getQueryMapGoogle(openLocateLocation));
+        GooglePlaceClient client = GooglePlaceClientGenerator.createClient(GooglePlaceClient.class);
+        Call<GooglePlaceBody> call= client.getNearByPlaces(getQueryMapGoogle(openLocateLocation));
 
         call.enqueue(new Callback<GooglePlaceBody>() {
             @Override
@@ -291,47 +270,8 @@ public void fetchGooglePlaces(OpenLocateLocation openLocateLocation, final SafeG
 
 ```
 
-#### For example, to query Safegraph Places API using location:
 
-SafeGraph Places API: https://partners.safegraph.com/places
-
-```java
-
-private Map<String, String> getQueryMap(OpenLocateLocation location) {
-        Map<String, String> queryMap = new HashMap<>();
-        queryMap.put("advertising_id", location.getAdvertisingInfo().getId());
-        queryMap.put("advertising_id_type", "aaid");
-        queryMap.put("latitude", String.valueOf(location.getLocation().getLatitude()));
-        queryMap.put("longitude", String.valueOf(location.getLocation().getLongitude()));
-        queryMap.put("horizontal_accuracy", String.valueOf(location.getLocation().getHorizontalAccuracy()));
-        return queryMap;
- }
-
- private void fetchNearbyPlaces() {
-    // These classes can be found in the example app in this repo
-     SafeGraphPlaceClient safeGraphPlaceClient = ClientGenerator.createClient(SafeGraphPlaceClient.class);
-     Call<SafeGraphPlaceBody> call = safeGraphPlaceClient.getAllPlaces(getQueryMap(openLocateLocation));
-
-     call.enqueue(new Callback<SafeGraphPlaceBody>() {
-         @Override
-         public void onResponse(Call<SafeGraphPlaceBody> call, Response<SafeGraphPlaceBody> response) {
-
-             if (response.isSuccessful()) {
-                 List<SafeGraphPlace> places = response.body().getPlaceList();
-                 //TODO Do something with places
-             }
-         }
-
-         @Override
-         public void onFailure(Call<SafeGraphPlaceBody> call, Throwable t) {
-             //error
-         }
-     });
- }
-
-```
-
-Similarly, OpenLocate SDK can be used to query additional APIs such as Facebook Places Graph or any other 3rd party places API.
+Similarly, OpenLocate can be used to query additional APIs such as Facebook Places Graph or any other 3rd party places API.
 
 - Facebook Places API - https://developers.facebook.com/docs/places/
 
