@@ -39,6 +39,7 @@ public final class OpenLocateLocation implements JsonObjectType {
         static final String LONGITUDE = "longitude";
         static final String HORIZONTAL_ACCURACY = "horizontal_accuracy";
         static final String TIMESTAMP = "utc_timestamp";
+        static final String TIMESTAMP_RECEIVED = "utc_timestamp_received";
         static final String AD_ID = "ad_id";
         static final String AD_OPT_OUT = "ad_opt_out";
         static final String AD_TYPE = "id_type";
@@ -117,6 +118,12 @@ public final class OpenLocateLocation implements JsonObjectType {
             location.setCourse(Float.parseFloat(json.getString(Keys.COURSE)));
             location.setSpeed(Float.parseFloat(json.getString(Keys.SPEED)));
             location.setVerticalAccuracy(Float.parseFloat(json.getString(Keys.VERTICAL_ACCURACY)));
+
+            try {
+                location.setVerticalAccuracy(Float.parseFloat(json.getString(Keys.VERTICAL_ACCURACY)));
+            } catch (JSONException e) {
+                location.setVerticalAccuracy(0);
+            }
 
             String deviceManufacturer = "";
             if (json.has(Keys.DEVICE_MANUFACTURER)) {
@@ -199,9 +206,13 @@ public final class OpenLocateLocation implements JsonObjectType {
                     .put(Keys.AD_TYPE, ADVERTISING_ID_TYPE)
                     .put(Keys.VERTICAL_ACCURACY, location.getVerticalAccuracy());
 
-            if(!TextUtils.isEmpty(informationFields.getManufacturer()))
-                jsonObject.put(Keys.DEVICE_MANUFACTURER, informationFields.getManufacturer());
+            if (created != null) {
+                jsonObject.put(Keys.TIMESTAMP_RECEIVED, TimeUnit.MILLISECONDS.toSeconds(getCreated().getTime()));
+            }
 
+            if(!TextUtils.isEmpty(informationFields.getManufacturer())) {
+                jsonObject.put(Keys.DEVICE_MANUFACTURER, informationFields.getManufacturer());
+            }
 
             if(!TextUtils.isEmpty(informationFields.getModel())) {
                 jsonObject.put(Keys.DEVICE_MODEL, informationFields.getModel());
@@ -357,6 +368,7 @@ public final class OpenLocateLocation implements JsonObjectType {
                 "location=" + location +
                 ", advertisingInfo=" + advertisingInfo +
                 ", informationFields=" + informationFields +
+                ", receivedAt=" + created +
                 '}';
     }
 }

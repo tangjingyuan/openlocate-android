@@ -2,14 +2,29 @@
 
 `OpenLocate-Android` adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.3.0](https://github.com/OpenLocate/openlocate-ios/tag/1.3.0)
+## [2.0.0-rc-2](https://github.com/OpenLocate/openlocate-ios/tag/2.0.0-rc-2)
+
+#### Fixed
+
+- Fixed issue where `setHeaders(...)` on `OpenLocate.Configuration.Builder` did not set the header correctly.
+
+
+## [2.0.0-rc-1](https://github.com/OpenLocate/openlocate-ios/tag/2.0.0-rc-1)
 
 #### Added
 
+- Android O Support without a foreground notification
+- Added OpenLocate specific User-Agent for http requests
+- Removed deprected GCM Library
 - Upgrade to API 26 as compile version. (#90)
 - Ability to force send current data collected. (#90)
 - Data now includes vertical accuracy (altitude accuracy)
 
+## [1.2.1](https://github.com/OpenLocate/openlocate-ios/tag/1.2.1)
+
+#### Fixed
+
+- Fixed issue where periodic location data upload is reset when application is restarted
 
 ## [1.2.0](https://github.com/OpenLocate/openlocate-ios/tag/1.2.0)
 
